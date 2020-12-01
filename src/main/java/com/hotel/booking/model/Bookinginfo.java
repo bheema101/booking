@@ -7,7 +7,7 @@ public class Bookinginfo  {
 	private String bookingid;
 	private String hotelName;
 	private String userName;
-	private LinkedList x;
+	
 
 	public Bookinginfo(String bookingid, String hotelName, String userName) {
 		super();

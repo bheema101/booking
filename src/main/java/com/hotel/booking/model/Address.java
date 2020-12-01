@@ -2,8 +2,8 @@ package com.hotel.booking.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-@Entity
+//import javax.persistence.Entity;
+//@Entity
 public class Address implements Serializable {
 	private String houseNo;
 	private String street;

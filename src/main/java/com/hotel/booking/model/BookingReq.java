@@ -3,58 +3,49 @@ package com.hotel.booking.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import org.springframework.data.annotation.Id;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-//@Entity
-public class Hotel implements Serializable {
+
+public class BookingReq implements Serializable{
 	private int id;
 	private String hotelName;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime checkinTime;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime checkoutTime;
-	//@OneToOne
-    //@JoinColumn(name="id")
+	private int checkinpersons;
+	private double price;
 	Address address;
-	Aminites aminites;
+	User user;
 	
 	
-	public Hotel() {
-		
+	
+	
+	
+	
+	public double getPrice() {
+		return price;
 	}
-	
+	public void setPrice(double price) {
+		this.price = price;
+	}
+	public int getCheckinpersons() {
+		return checkinpersons;
+	}
+	public void setCheckinpersons(int checkinpersons) {
+		this.checkinpersons = checkinpersons;
+	}
 	public int getId() {
 		return id;
 	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
-
 	public String getHotelName() {
 		return hotelName;
 	}
 	public void setHotelName(String hotelName) {
 		this.hotelName = hotelName;
 	}
-	public Address getAddress() {
-		return address;
-	}
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-	public Aminites getAminites() {
-		return aminites;
-	}
-	public void setAminites(Aminites aminites) {
-		this.aminites = aminites;
-	}
-	
-	
 	public LocalDateTime getCheckinTime() {
 		return checkinTime;
 	}
@@ -67,11 +58,19 @@ public class Hotel implements Serializable {
 	public void setCheckoutTime(LocalDateTime checkoutTime) {
 		this.checkoutTime = checkoutTime;
 	}
-	@Override
-	public String toString() {
-		return "Hotel [hotelName=" + hotelName + ", address=" + address + ", aminites=" + aminites + "]";
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	
-	
+
 }

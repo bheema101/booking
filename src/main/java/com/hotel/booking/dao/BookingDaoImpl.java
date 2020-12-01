@@ -11,8 +11,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -22,17 +28,35 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 //import org.springframework.data.repository.CrudRepository;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import com.hotel.booking.dao.query.Quary;
+import com.hotel.booking.dao.query.Query;
 import com.hotel.booking.model.Address;
+import com.hotel.booking.model.BookingReq;
 import com.hotel.booking.model.Hotel;
+import com.hotel.booking.model.MailDto;
+import com.hotel.booking.model.User;
+import com.hotel.booking.rest.BookingController;
+import com.hotel.booking.service.BookingService;
 
 @Repository
 public class BookingDaoImpl implements BookingDao{
+	
+	
+private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.class);
+	
+	
+	
+	
+	
+	
+	@Autowired
+	RestTemplate restTemplate;
+	
 	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
@@ -96,7 +120,32 @@ public class BookingDaoImpl implements BookingDao{
 	public List<Hotel> getAvialbility(Hotel hotel) {
 		Object[] args = new Object[] 
 				{hotel.getCheckinTime(),hotel.getCheckoutTime(),hotel.getCheckinTime(),hotel.getCheckoutTime(),hotel.getHotelName()};
-		List<Hotel> hotels = jdbcTemplate.query(Quary.availability,args , 
+		List<Hotel> hotels = jdbcTemplate.query(Query.AVAILABILITY,args , 
+				new ResultSetExtractor<List<Hotel>>() {
+
+					@Override
+					public List<Hotel> extractData(ResultSet rs) throws SQLException, DataAccessException {
+						List<Hotel> hotels = new ArrayList<>();
+						 while(rs.next()){  
+						Hotel avaiHotel = new Hotel();
+					    avaiHotel.setHotelName(rs.getString("hotelName"));
+					    avaiHotel.setCheckinTime(rs.getTimestamp("checkinTime").toLocalDateTime());
+					    avaiHotel.setId(rs.getInt("id"));
+					    hotels.add(avaiHotel);
+					    
+						 }
+						return hotels;
+					}
+			
+		});
+		return hotels;
+	}
+
+
+	@Override
+	public List<Hotel> getBookings(String hotelName) {
+		
+		List<Hotel> hotels = jdbcTemplate.query(Query.FETCHBOOKINGS,new Object[] {hotelName} , 
 				new ResultSetExtractor<List<Hotel>>() {
 
 					@Override
@@ -113,7 +162,74 @@ public class BookingDaoImpl implements BookingDao{
 			
 		});
 		return hotels;
+
 	}
+	
+	public void bookHotel(BookingReq bookreq) {
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(Query.INSERT_BOOKING);
+				ps.setInt(1, bookreq.getId());
+				ps.setString(2, bookreq.getHotelName());
+				ps.setTimestamp(3, Timestamp.valueOf(bookreq.getCheckinTime()));
+				ps.setTimestamp(4, Timestamp.valueOf(bookreq.getCheckoutTime()));
+				ps.setInt(5,bookreq.getCheckinpersons());
+				ps.setDouble(6, bookreq.getPrice());
+				ps.setBoolean(7,true);
+				return ps;
+			}
+		});
+		
+		User user = bookreq.getUser();
+		
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(Query.INSERT_USER);
+				ps.setString(1, user.getFirstName());
+				ps.setString(2, user.getLastName());
+				ps.setString(3,user.getEmail());
+				ps.setString(4, user.getMobile());
+				ps.setInt(5,bookreq.getId());
+				return ps;
+			}
+		});
+					
+		    MailDto mailDto = new MailDto();
+		    mailDto.setMailSubject("Hotel Booking Confirmation");
+			mailDto.setBookingMessage("your hotel booking with id "+ bookreq.getId() +"Successfully completed");
+			mailDto.setToEmailAddress(user.getEmail());
+			SendMail(mailDto);
+		
+		
+	}
+
+
+	@Override
+	public void cancelBooking(int bookingid) {
+		jdbcTemplate.update("update  booking set booking_status = ? where id = ?",new Object[] {false,bookingid});
+			String emailAddress = jdbcTemplate.queryForObject("select email from user where hotelid = "+bookingid,String.class);
+			MailDto mailDto = new MailDto();
+			mailDto.setMailSubject("Hotel Booking Canelation");
+			mailDto.setBookingMessage("your hotel booking id "+ bookingid +" was Cancelled succesfully");
+			mailDto.setToEmailAddress(emailAddress);
+			SendMail(mailDto);
+		
+	}
+	
+	
+	public void SendMail(MailDto mailDto) {
+		try {
+			HttpEntity<MailDto> entity = new HttpEntity<MailDto>(mailDto);
+			ResponseEntity<String> response = restTemplate.exchange("http://email-app/sendMail", HttpMethod.POST, entity, String.class);//("", String.class);
+		} catch (Exception e) {
+			LOGGER.error("Exception occured while sendingmail",e);
+		}
+
+	}
+	
 	
 	
 }
