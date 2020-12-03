@@ -1,15 +1,22 @@
 package com.hotel.booking.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class Bookinginfo  {
-	private String bookingid;
+	private int bookingid;
 	private String hotelName;
 	private String userName;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime checkinTime;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime checkoutTime;
 	
 
-	public Bookinginfo(String bookingid, String hotelName, String userName) {
+	public Bookinginfo(int bookingid, String hotelName, String userName) {
 		super();
 		this.bookingid = bookingid;
 		this.hotelName = hotelName;
@@ -21,11 +28,11 @@ public class Bookinginfo  {
 		
 	}
 
-	public String getBookingid() {
+	public int getBookingid() {
 		return bookingid;
 	}
 
-	public void setBookingid(String bookingid) {
+	public void setBookingid(int bookingid) {
 		this.bookingid = bookingid;
 	}
 
@@ -44,5 +51,22 @@ public class Bookinginfo  {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+
+	public LocalDateTime getCheckinTime() {
+		return checkinTime;
+	}
+
+	public void setCheckinTime(LocalDateTime checkinTime) {
+		this.checkinTime = checkinTime;
+	}
+
+	public LocalDateTime getCheckoutTime() {
+		return checkoutTime;
+	}
+
+	public void setCheckoutTime(LocalDateTime checkoutTime) {
+		this.checkoutTime = checkoutTime;
+	}
+	
 
 }

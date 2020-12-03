@@ -37,6 +37,7 @@ import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.hotel.booking.dao.query.Query;
 import com.hotel.booking.model.Address;
 import com.hotel.booking.model.BookingReq;
+import com.hotel.booking.model.Bookinginfo;
 import com.hotel.booking.model.Hotel;
 import com.hotel.booking.model.MailDto;
 import com.hotel.booking.model.User;
@@ -143,25 +144,28 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 
 
 	@Override
-	public List<Hotel> getBookings(String hotelName) {
+	public List<Bookinginfo> getBookings(String hotelName) {
 		
-		List<Hotel> hotels = jdbcTemplate.query(Query.FETCHBOOKINGS,new Object[] {hotelName} , 
-				new ResultSetExtractor<List<Hotel>>() {
+		List<Bookinginfo> bookinginfos = jdbcTemplate.query(Query.FETCHBOOKINGS_BY_HOTEL,new Object[] {true,hotelName} , 
+				new ResultSetExtractor<List<Bookinginfo>>() {
 
 					@Override
-					public List<Hotel> extractData(ResultSet rs) throws SQLException, DataAccessException {
-						List<Hotel> hotels = new ArrayList<>();
+					public List<Bookinginfo> extractData(ResultSet rs) throws SQLException, DataAccessException {
+						List<Bookinginfo> bookinginfos = new ArrayList<>();
 						 while(rs.next()){  
-						Hotel avaiHotel = new Hotel();
-					    avaiHotel.setHotelName(rs.getString("hotelName"));
-					    avaiHotel.setCheckinTime(rs.getTimestamp("checkinTime").toLocalDateTime());
-					    hotels.add(avaiHotel);
+						Bookinginfo bookinginfo = new Bookinginfo();
+						bookinginfo.setBookingid(rs.getInt("id"));
+						bookinginfo.setHotelName(rs.getString("hotelName"));
+						bookinginfo.setUserName(rs.getString("fullName"));
+						bookinginfo.setCheckinTime(rs.getTimestamp("checkinTime").toLocalDateTime());
+						bookinginfo.setCheckoutTime(rs.getTimestamp("checkouttime").toLocalDateTime());
+						bookinginfos.add(bookinginfo);
 						 }
-						return hotels;
+						return bookinginfos;
 					}
 			
 		});
-		return hotels;
+		return bookinginfos;
 
 	}
 	

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.hotel.booking.dao.BookingDao;
 import com.hotel.booking.model.BookingReq;
+import com.hotel.booking.model.Bookinginfo;
 import com.hotel.booking.model.Hotel;
 import com.hotel.booking.service.BookingService;
 
@@ -27,7 +28,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public List<Hotel> getbookings(String hotelName) {
+	public List<Bookinginfo> getbookings(String hotelName) {
 		
 		return bookingdao.getBookings(hotelName);
 	}

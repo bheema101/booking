@@ -49,14 +49,14 @@ public class BookingController {
 	RestTemplate restTemplate;
 	
 	@GetMapping(value = "/bookings/{hotelName}")
-	public ResponseEntity<List<Hotel>> getBookings(@PathVariable String hotelName) {
+	public ResponseEntity<List<Bookinginfo>> getBookings(@PathVariable String hotelName) {
 		
 		LOGGER.info("---STARTED /bookings ENDPOINT--");
 		List<Bookinginfo> bookinginfo = new ArrayList<>();
 		//bookinginfo.add(new Bookinginfo("id", "hotel", "userName"));
-		List<Hotel> getbookings = bookingService.getbookings(hotelName);
+		List<Bookinginfo> getbookings = bookingService.getbookings(hotelName);
 		LOGGER.info("---END bookings ENDPOINT--");
-		return new ResponseEntity<List<Hotel>>(getbookings,HttpStatus.OK);
+		return new ResponseEntity<List<Bookinginfo>>(getbookings,HttpStatus.OK);
 		
 	}
 	
