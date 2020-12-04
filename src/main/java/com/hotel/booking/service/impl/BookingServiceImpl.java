@@ -34,13 +34,13 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public void bookHotel(BookingReq bookreq) {
-		bookingdao.bookHotel(bookreq);
+	public String bookHotel(BookingReq bookreq) {
+     return bookingdao.bookHotel(bookreq);
 		
 	}
 
 	@Override
-	public void cancelBooking(int bookingid) {
+	public void cancelBooking(String bookingid) {
 		bookingdao.cancelBooking(bookingid);
 		
 	}

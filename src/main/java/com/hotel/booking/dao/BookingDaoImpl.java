@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -131,6 +132,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 						Hotel avaiHotel = new Hotel();
 					    avaiHotel.setHotelName(rs.getString("hotelName"));
 					    avaiHotel.setCheckinTime(rs.getTimestamp("checkinTime").toLocalDateTime());
+					    avaiHotel.setCheckoutTime(rs.getTimestamp("checkoutTime").toLocalDateTime());
 					    avaiHotel.setId(rs.getInt("id"));
 					    hotels.add(avaiHotel);
 					    
@@ -169,7 +171,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 
 	}
 	
-	public void bookHotel(BookingReq bookreq) {
+	public String bookHotel(BookingReq bookreq) {
+		String bookingId = UUID.randomUUID().toString();
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			
 			@Override
@@ -182,6 +185,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 				ps.setInt(5,bookreq.getCheckinpersons());
 				ps.setDouble(6, bookreq.getPrice());
 				ps.setBoolean(7,true);
+				ps.setString(8, bookingId);
 				return ps;
 			}
 		});
@@ -197,6 +201,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 				ps.setString(3,user.getEmail());
 				ps.setString(4, user.getMobile());
 				ps.setInt(5,bookreq.getId());
+				ps.setString(6, bookingId);
 				return ps;
 			}
 		});
@@ -206,15 +211,15 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.c
 			mailDto.setBookingMessage("your hotel booking with id "+ bookreq.getId() +"Successfully completed");
 			mailDto.setToEmailAddress(user.getEmail());
 			SendMail(mailDto);
-		
-		
+		 
+		return bookingId;
 	}
 
 
 	@Override
-	public void cancelBooking(int bookingid) {
-		jdbcTemplate.update("update  booking set booking_status = ? where id = ?",new Object[] {false,bookingid});
-			String emailAddress = jdbcTemplate.queryForObject("select email from user where hotelid = "+bookingid,String.class);
+	public void cancelBooking(String bookingid) {
+		jdbcTemplate.update("update  booking set booking_status = ? where bookingId = ?",new Object[] {false,bookingid});
+			String emailAddress = jdbcTemplate.queryForObject("select email from user where bookingId = ? ",new Object[]{bookingid},String.class);
 			MailDto mailDto = new MailDto();
 			mailDto.setMailSubject("Hotel Booking Canelation");
 			mailDto.setBookingMessage("your hotel booking id "+ bookingid +" was Cancelled succesfully");

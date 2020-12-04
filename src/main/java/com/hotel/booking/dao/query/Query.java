@@ -6,10 +6,10 @@ public class Query {
  public static final String FETCHBOOKINGS = "select * from booking where hotelName = ?";
  
  public static final String FETCHBOOKINGS_BY_HOTEL = "SELECT b.id,b.hotelName, concat(u.firstName,\" \",u.lastName) as fullName ,b.checkintime,b.checkouttime"+
-  " FROM booking as b,user as u where u.hotelid = b.id and booking_status=? and b.hotelName=?";
+  " FROM booking as b,user as u where u.bookingId = b.bookingId and booking_status=? and b.hotelName=?";
 
  
- public static final String INSERT_BOOKING = "insert into booking (id,hotelName, checkintime,checkouttime,allowedcapacity,price,booking_status)"
- 		                                                +" values ( ?,?,?,?,?,?,?)";
- public static final String INSERT_USER = "insert into user (firstName,lastName,email,mobile,hotelid) values (?,?,?,?,?)";
+ public static final String INSERT_BOOKING = "insert into booking (id,hotelName, checkintime,checkouttime,allowedcapacity,price,booking_status,bookingId)"
+ 		                                                +" values ( ?,?,?,?,?,?,?,?)";
+ public static final String INSERT_USER = "insert into user (firstName,lastName,email,mobile,hotelid,bookingId) values (?,?,?,?,?,?)";
 }

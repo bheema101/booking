@@ -10,6 +10,6 @@ public interface BookingDao {
 		void saveBooking(Hotel hotel);
 		List<Hotel> getAvialbility(Hotel hotel);
 		List<Bookinginfo> getBookings(String hotelName);
-		void bookHotel(BookingReq bookreq);
-		void cancelBooking(int bookingid);
+		String bookHotel(BookingReq bookreq);
+		void cancelBooking(String bookingid);
 }

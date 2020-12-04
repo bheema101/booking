@@ -83,12 +83,12 @@ public class BookingController {
 	
 	@PostMapping(value = "/bookhotel")
 	public ResponseEntity<String> bookHotel(@RequestBody BookingReq bookreq) {
-		bookingService.bookHotel(bookreq);
-		return new ResponseEntity<String>("created",HttpStatus.ACCEPTED);
+		String bookingId = bookingService.bookHotel(bookreq);
+		return new ResponseEntity<String>(bookingId,HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping(value="/cancelBooking/{bookingid}") 
-	public ResponseEntity<?> cancelBooking(@PathVariable int bookingid) {
+	public ResponseEntity<?> cancelBooking(@PathVariable String bookingid) {
 		bookingService.cancelBooking(bookingid);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
